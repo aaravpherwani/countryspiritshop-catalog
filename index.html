@@ -303,18 +303,19 @@
       color: var(--text-main);
     }
 
-    .search-icon-hint {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      opacity: 0.6;
-      transition: opacity 0.2s ease, color 0.2s ease;
+    .ai-icon-hint {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      opacity: 0.7;
+      border-radius: 50%;
+      transition: opacity 0.2s ease, transform 0.2s ease;
     }
-
-    .product-card:hover .search-icon-hint {
+    
+    .product-card:hover .ai-icon-hint {
       opacity: 1;
-      color: var(--accent);
+      transform: scale(1.12);
     }
-
     /* Load More Button */
     .load-more-container {
       text-align: center;
@@ -608,7 +609,7 @@
         const aiPrompt = `Provide product details for ${product.name} ${product.size}. Include a short description, tasting notes, brand background, and an image if available. Focus only on this product.`;
         const aiUrl = `https://chatgpt.com/?q=${encodeURIComponent(aiPrompt)}`;
         return `
-          <a href="${aiUrl}" target="_blank" rel="noopener noreferrer" class="product-card" title="View product information">
+          <a href="${aiUrl}" target="_blank" rel="noopener noreferrer" class="product-card" title="Get AI product details">
             <div class="product-details">
               <h3 class="product-name">${escapeHTML(product.name)}</h3>
               <div class="product-meta">
@@ -620,7 +621,10 @@
                 <span class="price-label">Price</span>
                 <span class="product-price">$${product.price.toFixed(2)}</span>
               </div>
-              <i class="fa-solid fa-circle-info search-icon-hint"></i>
+              <img 
+  src="https://cdn.freepixel.com/thumb/free-svg-a-stylized-icon-representing-information-or-detail-th-1403-info-sparkle-48-filled-c-os-167341.jpg"
+  class="ai-icon-hint"
+  alt="AI product details">
             </div>
           </a>
         `;
