@@ -201,7 +201,7 @@
       background-position: right 1rem center;
       background-size: 1.1em;
       flex: 1;
-      min-width: 200px;
+      min-width: 180px;
     }
 
     .select-dropdown:focus, .select-dropdown:hover {
@@ -452,6 +452,11 @@
           <input type="text" id="searchInput" class="search-input" placeholder="Search by name/code...">
         </div>
 
+        <!-- Category Dropdown -->
+        <select id="categorySelect" class="select-dropdown">
+          <option value="all" selected>All Categories</option>
+        </select>
+
         <!-- Sort Dropdown -->
         <select id="sortSelect" class="select-dropdown">
           <option value="name-asc" selected>Name (A → Z)</option>
@@ -492,6 +497,7 @@
     // DOM Elements
     const productGrid = document.getElementById('productGrid');
     const searchInput = document.getElementById('searchInput');
+    const categorySelect = document.getElementById('categorySelect');
     const sortSelect = document.getElementById('sortSelect');
     const resultsCount = document.getElementById('resultsCount');
     const loadMoreContainer = document.getElementById('loadMoreContainer');
@@ -525,20 +531,24 @@
     });
 
     function processCSVData(data) {
+      // 1. Process and extract all product details including Category Group Name
       rawProducts = data.map(item => {
         const name = (item['Name'] || item['Item Name'] || '').trim();
         const price = parseFloat(item['Unit Price'] || item['Modifiers Price'] || item['Price'] || 0);
         const qty = parseFloat(item['Qty On Hand'] || item['Total Qty On Hand'] || 0);
         const size = item['Size'] !== 'MISC' && item['Size'] ? item['Size'].trim() : '';
+        const category = (item['Category Group Name'] || '').trim();
 
         return {
           name: name,
           price: isNaN(price) ? 0 : price,
           qty: isNaN(qty) ? 0 : qty,
           size: size,
+          category: category,
           upc: item['UPC Full'] || item['Stock Code'] || ''
         };
       }).filter(p => {
+        // Base criteria: must have an active name, stock, and positive price
         if (!p.name || p.qty <= 0) return false;
         if (p.price <= 0) return false;
 
@@ -558,20 +568,49 @@
         return true;
       });
 
+      // 2. Dynamically gather category list where at least one matching item is in stock
+      populateCategoryDropdown();
+
       applyFiltersAndSort();
+    }
+
+    function populateCategoryDropdown() {
+      const categorySet = new Set();
+      
+      rawProducts.forEach(product => {
+        if (product.category) {
+          categorySet.add(product.category);
+        }
+      });
+
+      // Convert Set to a sorted Array
+      const sortedCategories = Array.from(categorySet).sort((a, b) => a.localeCompare(b));
+
+      // Build options inside select menu element
+      sortedCategories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+      });
     }
 
     function applyFiltersAndSort() {
       const searchTerm = searchInput.value.toLowerCase().trim();
+      const selectedCategory = categorySelect.value;
       const sortOption = sortSelect.value;
 
       // Reset Pagination
       currentPage = 1;
 
-      // Search Filtering
+      // Filter by Search text AND Selected Category
       filteredProducts = rawProducts.filter(product => {
-        return product.name.toLowerCase().includes(searchTerm) || 
-               product.upc.toLowerCase().includes(searchTerm);
+        const matchesSearch = product.name.toLowerCase().includes(searchTerm) || 
+                              product.upc.toLowerCase().includes(searchTerm);
+        
+        const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+        
+        return matchesSearch && matchesCategory;
       });
 
       // Sorting Logic
@@ -660,6 +699,7 @@
 
     // Event Listeners
     searchInput.addEventListener('input', applyFiltersAndSort);
+    categorySelect.addEventListener('change', applyFiltersAndSort);
     sortSelect.addEventListener('change', applyFiltersAndSort);
     loadMoreBtn.addEventListener('click', loadMore);
   </script>
