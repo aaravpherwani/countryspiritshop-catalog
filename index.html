@@ -7,7 +7,7 @@
   <!-- Google Fonts & Font Awesome Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght=0,300..800;1,300..800&family=Playfair+Display:ital,wght=0,400..900;1,400..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- PapaParse for high-performance CSV processing -->
@@ -571,7 +571,8 @@
       // 2. Dynamically gather category list where at least one matching item is in stock
       populateCategoryDropdown();
 
-      applyFiltersAndSort();
+      // Check if there is an existing category hash routing on script load
+      checkHashRoute();
     }
 
     function populateCategoryDropdown() {
@@ -595,10 +596,40 @@
       });
     }
 
-    function applyFiltersAndSort() {
+    // New Function: Handles checking the URL fragment hash and applying filters
+    function checkHashRoute() {
+      const hash = decodeURIComponent(window.location.hash.substring(1)).trim();
+      
+      if (hash) {
+        // Check if the hash matches an option value in our category dropdown selector
+        const options = Array.from(categorySelect.options);
+        const matchedOption = options.find(opt => opt.value.toLowerCase() === hash.toLowerCase());
+        
+        if (matchedOption) {
+          categorySelect.value = matchedOption.value;
+        } else {
+          categorySelect.value = 'all';
+        }
+      } else {
+        categorySelect.value = 'all';
+      }
+      applyFiltersAndSort(false); // Passing false prevents updating the hash again during routing
+    }
+
+    function applyFiltersAndSort(updateHash = true) {
       const searchTerm = searchInput.value.toLowerCase().trim();
       const selectedCategory = categorySelect.value;
       const sortOption = sortSelect.value;
+
+      // Update URL hash state safely if triggered manually from drop-down UI interaction 
+      if (updateHash) {
+        if (selectedCategory === 'all') {
+          // Remove hash cleanly without throwing window anchor jumps
+          history.replaceState(null, null, ' ');
+        } else {
+          window.location.hash = encodeURIComponent(selectedCategory);
+        }
+      }
 
       // Reset Pagination
       currentPage = 1;
@@ -698,10 +729,13 @@
     }
 
     // Event Listeners
-    searchInput.addEventListener('input', applyFiltersAndSort);
-    categorySelect.addEventListener('change', applyFiltersAndSort);
-    sortSelect.addEventListener('change', applyFiltersAndSort);
+    searchInput.addEventListener('input', () => applyFiltersAndSort(true));
+    categorySelect.addEventListener('change', () => applyFiltersAndSort(true));
+    sortSelect.addEventListener('change', () => applyFiltersAndSort(true));
     loadMoreBtn.addEventListener('click', loadMore);
+
+    // Dynamic browser routing listener (when changing hash links on the go)
+    window.addEventListener('hashchange', checkHashRoute);
   </script>
 </body>
 </html>
