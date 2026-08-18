@@ -310,25 +310,26 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 36px;
-      height: 36px;
+      min-width: 44px;
+      height: 44px;
       border-radius: 50%;
       border: 1.5px solid #000000;
       color: #000000;
       background-color: transparent;
       text-decoration: none;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       flex-shrink: 0;
       transition: all 0.15s ease;
+      touch-action: manipulation;
     }
 
     .card-call-btn:hover {
       background-color: #f1f5f9;
-      transform: scale(1.05);
+      transform: scale(1.03);
     }
 
     .card-call-btn:active {
-      transform: scale(0.95);
+      transform: scale(0.97);
     }
 
     .card-order-btn {
@@ -336,18 +337,20 @@
       align-items: center;
       justify-content: center;
       flex: 1;
-      height: 36px;
+      min-height: 44px;
+      padding: 0 0.75rem;
       border: 1.5px solid #000000;
       border-radius: 6px;
       background-color: #ffffff;
       color: #0d1b2a;
       font-family: 'Open Sans', sans-serif;
-      font-size: 0.78rem;
-      font-weight: 700;
+      font-size: 0.8rem;
+      font-weight: 400; /* Explicitly non-bold */
       letter-spacing: 0.04em;
       text-decoration: none;
       transition: all 0.15s ease;
       white-space: nowrap;
+      touch-action: manipulation;
     }
 
     .card-order-btn:hover {
@@ -466,13 +469,14 @@
         justify-content: center;
       }
       .card-order-btn {
-        font-size: 0.72rem;
-        height: 34px;
+        font-size: 0.75rem;
+        min-height: 40px;
+        font-weight: 400;
       }
       .card-call-btn {
-        width: 34px;
-        height: 34px;
-        font-size: 0.82rem;
+        min-width: 40px;
+        height: 40px;
+        font-size: 0.88rem;
       }
     }
   </style>
@@ -538,6 +542,7 @@
     
     const ITEMS_PER_PAGE = 24;
     let currentPage = 1;
+    const STORE_ORDER_URL = "https://www.order.store/store/country-spirit-shop/RUSUed0gXCywRi416n9Ecw";
 
     const productGrid = document.getElementById('productGrid');
     const searchInput = document.getElementById('searchInput');
@@ -687,11 +692,6 @@
       renderGrid();
     }
 
-    function getItemOrderUrl(product) {
-      const query = product.name.trim();
-      return `https://www.ubereats.com/store/country-spirit-shop/RUSUed0gXCywRi416n9Ecw?mod=inStoreSearch&ps=1&searchResultsQuery=${encodeURIComponent(query)}`;
-    }
-
     function renderGrid() {
       const visibleCount = currentPage * ITEMS_PER_PAGE;
       const productsToDisplay = filteredProducts.slice(0, visibleCount);
@@ -710,8 +710,6 @@
       }
 
       productGrid.innerHTML = productsToDisplay.map(product => {
-        const orderUrl = getItemOrderUrl(product);
-
         return `
           <div class="product-card">
             <div class="product-details">
@@ -730,7 +728,7 @@
               <a href="tel:+12032634572" class="card-call-btn" title="Call Store">
                 <i class="fa-solid fa-phone"></i>
               </a>
-              <a href="${orderUrl}" target="_blank" rel="noopener noreferrer" class="card-order-btn">
+              <a href="${STORE_ORDER_URL}" target="_blank" rel="noopener noreferrer" class="card-order-btn">
                 ORDER ONLINE
               </a>
             </div>
