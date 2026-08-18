@@ -1,235 +1,741 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Country Spirit Shop - Product Catalog</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Catalog</title>
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght=0,300..800;1,300..800&family=Playfair+Display:ital,wght=0,400..900;1,400..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- PapaParse for CSV processing -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.parse.js"></script>
+  <!-- PapaParse for high-performance CSV processing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <style>
-    .product-card {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --accent: #1e40af;
+      --accent-hover: #1e3a8a;
+      --border-color: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+      --radius: 16px;
     }
-    .product-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Open Sans', sans-serif;
     }
-    .img-container {
-      height: 200px;
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding-bottom: 3rem;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Header & Hero - Dark Royal Blue */
+    header {
+      background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+      color: #fff;
+      padding: 2.5rem 1.25rem 2.25rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    header p {
+      font-family: 'Open Sans', sans-serif;
+      color: #cbd5e1;
+      font-size: 1rem;
+      font-weight: 300;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Action Buttons Row */
+    .header-buttons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f5efe6;
+      color: #000000;
+      border: 1px solid #000000;
+      border-radius: 5px;
+      height: 36px;
+      width: 170px;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      box-shadow: none;
+      box-sizing: border-box;
+    }
+
+    .action-btn:hover {
+      background-color: #eae1d5;
+      color: #000000;
+    }
+
+    .action-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 0;
+    }
+
+    /* Disclaimer Banner */
+    .disclaimer-banner {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 1.25rem;
+      padding: 0 0.5rem;
+      line-height: 1.4;
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #f8fafc;
+      gap: 0.5rem;
     }
-    .img-container img {
-      max-height: 100%;
-      max-width: 100%;
+
+    .disclaimer-banner i {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    /* Control Panel */
+    .controls-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Controls Row */
+    .search-row {
+      display: flex;
+      gap: 0.85rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      flex: 2;
+      min-width: 220px;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      left: 1rem;
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 48px;
+      padding: 0 1rem 0 2.75rem;
+      font-size: 0.95rem;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background-color: #f8fafc;
+      color: var(--text-main);
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      background-color: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.15);
+    }
+
+    .select-dropdown {
+      height: 48px;
+      padding: 0 2.5rem 0 1rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background-color: #f8fafc;
+      color: var(--text-main);
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s ease;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1.1em;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .select-dropdown:focus, .select-dropdown:hover {
+      background-color: #fff;
+      border-color: var(--accent);
+    }
+
+    .results-count {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    /* Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* Product Card */
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    @media (hover: hover) {
+      .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--accent);
+      }
+      .product-card:hover .product-name {
+        color: var(--accent);
+      }
+    }
+
+    .product-details {
+      margin-bottom: 1rem;
+    }
+
+    .product-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.4;
+      margin-bottom: 0.35rem;
+      transition: color 0.2s ease;
+    }
+
+    .product-meta {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .product-size {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 0.85rem;
+      margin-top: auto;
+    }
+
+    .price-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .price-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .product-price {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .ai-icon-hint {
+      width: 22px;
+      height: 22px;
       object-fit: contain;
+      opacity: 0.7;
+      border-radius: 50%;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    
+    .product-card:hover .ai-icon-hint {
+      opacity: 1;
+      transform: scale(1.12);
+    }
+    /* Load More Button */
+    .load-more-container {
+      text-align: center;
+      margin-top: 2rem;
+      margin-bottom: calc(6rem + env(safe-area-inset-bottom));
+    }
+    .btn-load-more {
+      background-color: var(--accent);
+      color: #ffffff;
+      border: none;
+      padding: 0.85rem 2rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-load-more:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-load-more:active {
+      transform: scale(0.98);
+    }
+
+    /* States & Loading */
+    .state-container {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--text-muted);
+      grid-column: 1 / -1;
+    }
+
+    .state-container i {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #94a3b8;
+    }
+
+    /* Mobile Responsiveness Improvements */
+    @media (max-width: 640px) {
+      header {
+        padding: 2rem 1rem 1.5rem;
+      }
+      header h1 {
+        font-size: 2rem;
+      }
+      .header-buttons {
+        gap: 0.65rem;
+      }
+      .action-btn {
+        width: 145px;
+        height: 34px;
+        font-size: 0.78rem;
+      }
+      .container {
+        padding: 0.75rem 0.85rem 0;
+      }
+      .disclaimer-banner {
+        align-items: flex-start;
+        text-align: center;
+      }
+      .search-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+      }
+      .input-wrapper {
+        width: 100%;
+        min-width: 0;
+      }
+      .select-dropdown {
+        width: 100%;
+        min-width: 0;
+        height: 48px;
+      }
+      .results-count {
+        margin-left: 0;
+        text-align: center;
+        padding-top: 0.25rem;
+      }
+      .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 0.85rem;
+      }
+      .product-card {
+        padding: 1rem;
+      }
+      .product-name {
+        font-size: 0.925rem;
+      }
+      .product-price {
+        font-size: 1.1rem;
+      }
+      .btn-load-more {
+        width: 100%;
+        justify-content: center;
+      }
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body>
 
-  <!-- Header -->
-  <header class="bg-amber-900 text-amber-50 shadow-md">
-    <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
-      <div>
-        <h1 class="text-3xl font-bold tracking-tight">Country Spirit Shop</h1>
-        <p class="text-amber-200 text-sm mt-1">Woodbury, CT • Online Product Catalog</p>
-      </div>
-      
-      <!-- Search Input -->
-      <div class="w-full md:w-96 relative">
-        <input 
-          type="text" 
-          id="searchInput" 
-          placeholder="Search spirits, wine, beer..." 
-          class="w-full pl-10 pr-4 py-2 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-inner"
-        />
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
-      </div>
+  <header>
+    <h1>Product Catalog</h1>
+    <p>Explore our wide selection of items</p>
+    
+    <!-- Call Us and Visit Today Buttons -->
+    <div class="header-buttons">
+      <a href="tel:+12032634572" class="action-btn">CALL US</a>
+      <a href="https://share.google/wz4WZi4TAYX5HopcZ" target="_blank" rel="noopener noreferrer" class="action-btn">VISIT TODAY</a>
     </div>
   </header>
 
-  <!-- Main Container -->
-  <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
-    
-    <!-- Controls Bar -->
-    <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
-      <div id="productCount" class="text-slate-600 font-medium">
-        Loading catalog...
-      </div>
-      
-      <div class="flex items-center gap-2">
-        <label for="categoryFilter" class="text-sm font-medium text-slate-700">Filter:</label>
-        <select id="categoryFilter" class="bg-white border border-slate-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
-          <option value="ALL">All Categories</option>
+  <div class="container">
+    <!-- Disclaimer Banner -->
+    <div class="disclaimer-banner">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>Disclaimer: Information displayed is for informational purposes only and may not reflect real-time pricing or item availability.</span>
+    </div>
+
+    <!-- Filter & Search Panel -->
+    <div class="controls-card">
+      <div class="search-row">
+        <!-- Search Bar -->
+        <div class="input-wrapper">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search by name/code...">
+        </div>
+
+        <!-- Category Dropdown -->
+        <select id="categorySelect" class="select-dropdown">
+          <option value="all" selected>All Categories</option>
         </select>
+
+        <!-- Sort Dropdown -->
+        <select id="sortSelect" class="select-dropdown">
+          <option value="name-asc" selected>Name (A → Z)</option>
+          <option value="name-desc">Name (Z → A)</option>
+          <option value="price-low">Price (Low → High)</option>
+          <option value="price-high">Price (High → Low)</option>
+        </select>
+
+        <div id="resultsCount" class="results-count">Showing 0 products</div>
       </div>
     </div>
 
     <!-- Product Grid -->
-    <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <!-- Dynamic Product Cards Injected Here -->
+    <div id="productGrid" class="product-grid">
+      <div class="state-container">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <p>Loading items...</p>
+      </div>
     </div>
 
-    <!-- Empty State -->
-    <div id="noResults" class="hidden text-center py-16">
-      <i class="fa-solid fa-wine-bottle text-5xl text-slate-300 mb-3"></i>
-      <p class="text-lg text-slate-500 font-medium">No matching products found.</p>
+    <!-- Load More Button -->
+    <div id="loadMoreContainer" class="load-more-container" style="display: none;">
+      <button id="loadMoreBtn" class="btn-load-more">
+        <span>Load More Items</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
     </div>
+  </div>
 
-  </main>
-
-  <!-- Footer -->
-  <footer class="bg-slate-900 text-slate-400 py-6 mt-12 border-t border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 text-center text-sm">
-      <p>&copy; Country Spirit Shop. All rights reserved.</p>
-    </div>
-  </footer>
-
-  <!-- App Script -->
   <script>
-    const DEFAULT_PLACEHOLDER = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'%3E%3C/circle%3E%3Cpolyline points='21 15 16 10 5 21'%3E%3C/polyline%3E%3C/svg%3E";
+    let rawProducts = [];
+    let filteredProducts = [];
+    
+    // Pagination controls
+    const ITEMS_PER_PAGE = 24;
+    let currentPage = 1;
 
-    let catalogData = [];
+    // DOM Elements
+    const productGrid = document.getElementById('productGrid');
+    const searchInput = document.getElementById('searchInput');
+    const categorySelect = document.getElementById('categorySelect');
+    const sortSelect = document.getElementById('sortSelect');
+    const resultsCount = document.getElementById('resultsCount');
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
 
-    document.addEventListener("DOMContentLoaded", () => {
-      fetchCatalog();
+    // Fetch and parse CSV
+    document.addEventListener('DOMContentLoaded', () => {
+      const csvFilePath = 'items-7_30_2622_08_49.csv';
 
-      document.getElementById("searchInput").addEventListener("input", filterAndRender);
-      document.getElementById("categoryFilter").addEventListener("change", filterAndRender);
+      Papa.parse(csvFilePath, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          processCSVData(results.data);
+        },
+        error: function(err) {
+          Papa.parse('items.csv', {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+              processCSVData(results.data);
+            },
+            error: function() {
+              renderError('Failed to load CSV file. Please ensure items-7_30_2622_08_49.csv or items.csv exists in your repository root.');
+            }
+          });
+        }
+      });
     });
 
-    async function fetchCatalog() {
-      try {
-        Papa.parse("final.csv", {
-          download: true,
-          header: true,
-          skipEmptyLines: true,
-          complete: function(results) {
-            catalogData = results.data;
-            populateCategoryFilter(catalogData);
-            renderCatalog(catalogData);
-          },
-          error: function(err) {
-            console.error("Error parsing CSV:", err);
-            document.getElementById("productCount").innerText = "Error loading product data.";
-          }
-        });
-      } catch (err) {
-        console.error("Fetch failed:", err);
+    function processCSVData(data) {
+      // 1. Process and extract all product details including Category Group Name
+      rawProducts = data.map(item => {
+        const name = (item['Name'] || item['Item Name'] || '').trim();
+        const price = parseFloat(item['Unit Price'] || item['Modifiers Price'] || item['Price'] || 0);
+        const qty = parseFloat(item['Qty On Hand'] || item['Total Qty On Hand'] || 0);
+        const size = item['Size'] !== 'MISC' && item['Size'] ? item['Size'].trim() : '';
+        const category = (item['Category Group Name'] || '').trim();
+
+        return {
+          name: name,
+          price: isNaN(price) ? 0 : price,
+          qty: isNaN(qty) ? 0 : qty,
+          size: size,
+          category: category,
+          upc: item['UPC Full'] || item['Stock Code'] || ''
+        };
+      }).filter(p => {
+        // Base criteria: must have an active name, stock, and positive price
+        if (!p.name || p.qty <= 0) return false;
+        if (p.price <= 0) return false;
+
+        const lowerName = p.name.toLowerCase();
+        if (
+          lowerName.includes('env fee') ||
+          lowerName.includes('environmental fee') ||
+          lowerName.includes('enviornmental fee') ||
+          lowerName.includes('envoronmental fee') ||
+          lowerName.includes('freight charge') ||
+          lowerName.includes('deposit') ||
+          lowerName.includes('summary level adjustments')
+        ) {
+          return false;
+        }
+
+        return true;
+      });
+
+      // 2. Dynamically gather category list where at least one matching item is in stock
+      populateCategoryDropdown();
+
+      // Check if there is an existing category hash routing on script load
+      checkHashRoute();
+    }
+
+    function populateCategoryDropdown() {
+      const categorySet = new Set();
+      
+      rawProducts.forEach(product => {
+        if (product.category) {
+          categorySet.add(product.category);
+        }
+      });
+
+      // Convert Set to a sorted Array
+      const sortedCategories = Array.from(categorySet).sort((a, b) => a.localeCompare(b));
+
+      // Build options inside select menu element
+      sortedCategories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+      });
+    }
+
+    // New Function: Handles checking the URL fragment hash and applying filters
+    function checkHashRoute() {
+      const hash = decodeURIComponent(window.location.hash.substring(1)).trim();
+      
+      if (hash) {
+        // Check if the hash matches an option value in our category dropdown selector
+        const options = Array.from(categorySelect.options);
+        const matchedOption = options.find(opt => opt.value.toLowerCase() === hash.toLowerCase());
+        
+        if (matchedOption) {
+          categorySelect.value = matchedOption.value;
+        } else {
+          categorySelect.value = 'all';
+        }
+      } else {
+        categorySelect.value = 'all';
       }
+      applyFiltersAndSort(false); // Passing false prevents updating the hash again during routing
     }
 
-    function populateCategoryFilter(products) {
-      const select = document.getElementById("categoryFilter");
-      const categories = new Set();
+    function applyFiltersAndSort(updateHash = true) {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      const selectedCategory = categorySelect.value;
+      const sortOption = sortSelect.value;
 
-      products.forEach(p => {
-        if (p.category) categories.add(p.category.trim());
-      });
-
-      Array.from(categories).sort().forEach(cat => {
-        const option = document.createElement("option");
-        option.value = cat;
-        option.textContent = cat;
-        select.appendChild(option);
-      });
-    }
-
-    function filterAndRender() {
-      const query = document.getElementById("searchInput").value.toLowerCase().trim();
-      const category = document.getElementById("categoryFilter").value;
-
-      const filtered = catalogData.filter(item => {
-        const nameMatch = (item.name || "").toLowerCase().includes(query);
-        const brandMatch = (item.brand || "").toLowerCase().includes(query);
-        const upcMatch = (item.upc || "").includes(query);
-
-        const categoryMatch = category === "ALL" || (item.category && item.category.trim() === category);
-
-        return (nameMatch || brandMatch || upcMatch) && categoryMatch;
-      });
-
-      renderCatalog(filtered);
-    }
-
-    function renderCatalog(products) {
-      const grid = document.getElementById("productGrid");
-      const countEl = document.getElementById("productCount");
-      const noResults = document.getElementById("noResults");
-
-      grid.innerHTML = "";
-      countEl.innerText = `Showing ${products.length} items`;
-
-      if (products.length === 0) {
-        noResults.classList.remove("hidden");
-        return;
+      // Update URL hash state safely if triggered manually from drop-down UI interaction 
+      if (updateHash) {
+        if (selectedCategory === 'all') {
+          // Remove hash cleanly without throwing window anchor jumps
+          history.replaceState(null, null, ' ');
+        } else {
+          window.location.hash = encodeURIComponent(selectedCategory);
+        }
       }
-      noResults.classList.add("hidden");
 
-      products.forEach(product => {
-        const imageUrl = (product.image_url && product.image_url.startsWith("http")) 
-          ? product.image_url 
-          : DEFAULT_PLACEHOLDER;
+      // Reset Pagination
+      currentPage = 1;
 
-        const card = document.createElement("div");
-        card.className = "product-card bg-white rounded-xl border border-slate-200 overflow-hidden flex flex-col justify-between shadow-sm";
+      // Filter by Search text AND Selected Category
+      filteredProducts = rawProducts.filter(product => {
+        const matchesSearch = product.name.toLowerCase().includes(searchTerm) || 
+                              product.upc.toLowerCase().includes(searchTerm);
+        
+        const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+        
+        return matchesSearch && matchesCategory;
+      });
 
-        card.innerHTML = `
-          <div>
-            <div class="img-container p-4 border-b border-slate-100 relative">
-              <img 
-                src="${imageUrl}" 
-                alt="${escapeHtml(product.name || 'Product Image')}"
-                onerror="this.onerror=null; this.src='${DEFAULT_PLACEHOLDER}';"
-                loading="lazy"
-              />
-            </div>
-            <div class="p-4">
-              <div class="text-xs font-semibold text-amber-800 tracking-wide uppercase mb-1">
-                ${escapeHtml(product.brand || product.category || 'Spirits')}
-              </div>
-              <h2 class="font-bold text-slate-800 text-base leading-snug line-clamp-2">
-                ${escapeHtml(product.name || 'Unnamed Product')}
-              </h2>
-              ${product.size ? `<p class="text-xs text-slate-500 mt-1">${escapeHtml(product.size)}</p>` : ''}
-            </div>
-          </div>
+      // Sorting Logic
+      if (sortOption === 'name-desc') {
+        filteredProducts.sort((a, b) => b.name.localeCompare(a.name));
+      } else if (sortOption === 'price-low') {
+        filteredProducts.sort((a, b) => a.price - b.price);
+      } else if (sortOption === 'price-high') {
+        filteredProducts.sort((a, b) => b.price - a.price);
+      } else {
+        filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+      }
 
-          <div class="px-4 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-            <span class="text-lg font-bold text-slate-900">
-              ${product.price ? `$${parseFloat(product.price).toFixed(2)}` : 'In Store'}
-            </span>
-            <i class="fa-solid fa-wand-magic-sparkles text-amber-600 text-sm" title="Catalog Item"></i>
+      renderGrid();
+    }
+
+    function renderGrid() {
+      const visibleCount = currentPage * ITEMS_PER_PAGE;
+      const productsToDisplay = filteredProducts.slice(0, visibleCount);
+
+      resultsCount.textContent = `Showing ${productsToDisplay.length} of ${filteredProducts.length} product${filteredProducts.length !== 1 ? 's' : ''}`;
+
+      if (filteredProducts.length === 0) {
+        productGrid.innerHTML = `
+          <div class="state-container">
+            <i class="fa-solid fa-box-open"></i>
+            <p>No in-stock products found matching your criteria.</p>
           </div>
         `;
+        loadMoreContainer.style.display = 'none';
+        return;
+      }
 
-        grid.appendChild(card);
-      });
+      productGrid.innerHTML = productsToDisplay.map(product => {
+        const aiPrompt = `Provide product details for ${product.name} ${product.size}. Include a short description, tasting notes, brand background, and an image if available. Focus only on this product.`;
+        const aiUrl = `https://chatgpt.com/?q=${encodeURIComponent(aiPrompt)}`;
+        return `
+          <a href="${aiUrl}" target="_blank" rel="noopener noreferrer" class="product-card" title="Get AI product details">
+            <div class="product-details">
+              <h3 class="product-name">${escapeHTML(product.name)}</h3>
+              <div class="product-meta">
+                ${product.size ? `<span class="product-size"><i class="fa-solid fa-tag"></i> ${escapeHTML(product.size)}</span>` : ''}
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="price-container">
+                <span class="price-label">Price</span>
+                <span class="product-price">$${product.price.toFixed(2)}</span>
+              </div>
+              <img 
+  src="https://cdn.freepixel.com/thumb/free-svg-a-stylized-icon-representing-information-or-detail-th-1403-info-sparkle-48-filled-c-os-167341.jpg"
+  class="ai-icon-hint"
+  alt="AI product details">
+            </div>
+          </a>
+        `;
+      }).join('');
+
+      if (visibleCount < filteredProducts.length) {
+        loadMoreContainer.style.display = 'block';
+      } else {
+        loadMoreContainer.style.display = 'none';
+      }
     }
 
-    function escapeHtml(str) {
-      return str.replace(/[&<>"']/g, match => {
-        const escapeMap = {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#39;'
-        };
-        return escapeMap[match];
-      });
+    function loadMore() {
+      currentPage++;
+      renderGrid();
     }
+
+    function renderError(msg) {
+      productGrid.innerHTML = `
+        <div class="state-container">
+          <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i>
+          <p>${msg}</p>
+        </div>
+      `;
+      loadMoreContainer.style.display = 'none';
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+
+    // Event Listeners
+    searchInput.addEventListener('input', () => applyFiltersAndSort(true));
+    categorySelect.addEventListener('change', () => applyFiltersAndSort(true));
+    sortSelect.addEventListener('change', () => applyFiltersAndSort(true));
+    loadMoreBtn.addEventListener('click', loadMore);
+
+    // Dynamic browser routing listener (when changing hash links on the go)
+    window.addEventListener('hashchange', checkHashRoute);
   </script>
 </body>
 </html>
