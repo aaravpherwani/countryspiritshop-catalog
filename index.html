@@ -251,6 +251,31 @@
       .product-card:hover .product-name {
         color: var(--accent);
       }
+      .product-card:hover .product-image-frame img {
+        transform: scale(1.05);
+      }
+    }
+
+    /* Product Image Container */
+    .product-image-frame {
+      width: 100%;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f8fafc;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      overflow: hidden;
+      border: 1px solid #f1f5f9;
+    }
+
+    .product-image-frame img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      transition: transform 0.3s ease;
     }
 
     .product-details {
@@ -411,6 +436,10 @@
       .product-card {
         padding: 1rem;
       }
+      .product-image-frame {
+        height: 140px;
+        margin-bottom: 0.75rem;
+      }
       .product-name {
         font-size: 0.925rem;
       }
@@ -491,6 +520,9 @@
     let rawProducts = [];
     let filteredProducts = [];
     
+    // Default SVG Placeholder for missing/broken product images
+    const DEFAULT_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'%3E%3C/circle%3E%3Cpolyline points='21 15 16 10 5 21'%3E%3C/polyline%3E%3C/svg%3E";
+
     // Pagination controls
     const ITEMS_PER_PAGE = 24;
     let currentPage = 1;
@@ -532,13 +564,14 @@
     });
 
     function processCSVData(data) {
-      // 1. Process and extract all product details including Category Group Name
+      // 1. Process and extract all product details including image_url
       rawProducts = data.map(item => {
         const name = (item['Name'] || item['Item Name'] || '').trim();
         const price = parseFloat(item['Unit Price'] || item['Modifiers Price'] || item['Price'] || 0);
         const qty = parseFloat(item['Qty On Hand'] || item['Total Qty On Hand'] || 0);
         const size = item['Size'] !== 'MISC' && item['Size'] ? item['Size'].trim() : '';
         const category = (item['Category Group Name'] || '').trim();
+        const imageUrl = (item['image_url'] || item['Image URL'] || '').trim();
 
         return {
           name: name,
@@ -546,7 +579,8 @@
           qty: isNaN(qty) ? 0 : qty,
           size: size,
           category: category,
-          upc: item['UPC Full'] || item['Stock Code'] || ''
+          upc: item['UPC Full'] || item['Stock Code'] || '',
+          imageUrl: imageUrl
         };
       }).filter(p => {
         // Base criteria: must have an active name, stock, and positive price
@@ -679,8 +713,21 @@
       productGrid.innerHTML = productsToDisplay.map(product => {
         const aiPrompt = `Provide product details for ${product.name} ${product.size}. Include a short description, tasting notes, brand background, and an image if available. Focus only on this product.`;
         const aiUrl = `https://chatgpt.com/?q=${encodeURIComponent(aiPrompt)}`;
+        
+        const imgSrc = (product.imageUrl && product.imageUrl.startsWith('http')) 
+          ? escapeHTML(product.imageUrl) 
+          : DEFAULT_PLACEHOLDER;
+
         return `
           <a href="${aiUrl}" target="_blank" rel="noopener noreferrer" class="product-card" title="Get AI product details">
+            <!-- Product Image Display -->
+            <div class="product-image-frame">
+              <img src="${imgSrc}" 
+                   alt="${escapeHTML(product.name)}"
+                   loading="lazy"
+                   onerror="this.onerror=null; this.src='${DEFAULT_PLACEHOLDER}';">
+            </div>
+
             <div class="product-details">
               <h3 class="product-name">${escapeHTML(product.name)}</h3>
               <div class="product-meta">
@@ -693,9 +740,9 @@
                 <span class="product-price">$${product.price.toFixed(2)}</span>
               </div>
               <img 
-  src="https://cdn.freepixel.com/thumb/free-svg-a-stylized-icon-representing-information-or-detail-th-1403-info-sparkle-48-filled-c-os-167341.jpg"
-  class="ai-icon-hint"
-  alt="AI product details">
+                src="https://cdn.freepixel.com/thumb/free-svg-a-stylized-icon-representing-information-or-detail-th-1403-info-sparkle-48-filled-c-os-167341.jpg"
+                class="ai-icon-hint"
+                alt="AI product details">
             </div>
           </a>
         `;
@@ -724,7 +771,8 @@
     }
 
     function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, 
+      if (!str) return '';
+      return String(str).replace(/[&<>'"]/g, 
         tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
       );
     }
