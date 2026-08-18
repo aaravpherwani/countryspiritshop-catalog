@@ -539,8 +539,6 @@
     const ITEMS_PER_PAGE = 24;
     let currentPage = 1;
 
-    const STORE_BASE_URL = 'https://www.order.store/store/country-spirit-shop/RUSUed0gXCywRi416n9Ecw/';
-
     const productGrid = document.getElementById('productGrid');
     const searchInput = document.getElementById('searchInput');
     const categorySelect = document.getElementById('categorySelect');
@@ -583,33 +581,13 @@
         const size = item['Size'] !== 'MISC' && item['Size'] ? item['Size'].trim() : '';
         const category = (item['Category Group Name'] || '').trim();
 
-        // Dynamically extract Uber/Order Store full link or item path UUID sequence if available in CSV
-        const rawItemUrl = (
-          item['Item URL'] || 
-          item['Order URL'] || 
-          item['URL'] || 
-          item['Item Link'] || 
-          item['Uber Item URL'] || 
-          ''
-        ).trim();
-
-        const itemPath = (
-          item['Item Path'] || 
-          item['Path'] || 
-          item['Item UUID'] || 
-          item['Uber UUID'] || 
-          ''
-        ).trim();
-
         return {
           name: name,
           price: isNaN(price) ? 0 : price,
           qty: isNaN(qty) ? 0 : qty,
           size: size,
           category: category,
-          upc: item['UPC Full'] || item['Stock Code'] || '',
-          itemUrl: rawItemUrl,
-          itemPath: itemPath
+          upc: item['UPC Full'] || item['Stock Code'] || ''
         };
       }).filter(p => {
         if (!p.name || p.qty <= 0) return false;
@@ -710,20 +688,8 @@
     }
 
     function getItemOrderUrl(product) {
-      // 1. Direct URL explicitly provided in CSV column
-      if (product.itemUrl) {
-        return product.itemUrl;
-      }
-
-      // 2. Exact item UUID/Path sequence provided in CSV column
-      if (product.itemPath) {
-        const cleanPath = product.itemPath.replace(/^\//, '');
-        return `${STORE_BASE_URL}${cleanPath}`;
-      }
-
-      // 3. Fallback: Direct search query link on the store
-      const searchQuery = `${product.name} ${product.size}`.trim();
-      return `${STORE_BASE_URL}?q=${encodeURIComponent(searchQuery)}`;
+      const query = `${product.name} ${product.size}`.trim();
+      return `https://www.ubereats.com/store/country-spirit-shop/RUSUed0gXCywRi416n9Ecw?mod=inStoreSearch&ps=1&searchResultsQuery=${encodeURIComponent(query)}`;
     }
 
     function renderGrid() {
