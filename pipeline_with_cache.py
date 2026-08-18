@@ -2,9 +2,11 @@ import csv
 import json
 import os
 import re
+import urllib.request
+import urllib.parse
 
 # File Configurations
-INVENTORY_CSV = 'items.csv'          # Uploaded/replaced POS export
+INVENTORY_CSV = 'items.csv'           # Uploaded/replaced POS export
 MASTER_CACHE_FILE = 'image_cache.json' # Persistent memory across runs
 FINAL_CSV = 'final.csv'              # Master catalog used by index.html
 NEW_CSV = 'new.csv'                  # Overwritten each run (contains ONLY new items)
@@ -20,8 +22,11 @@ def clean_gtin(gtin_raw):
 
 def load_cache():
     if os.path.exists(MASTER_CACHE_FILE):
-        with open(MASTER_CACHE_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
+        try:
+            with open(MASTER_CACHE_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            return {}
     return {}
 
 def save_cache(cache):
@@ -40,37 +45,60 @@ def generate_description(product_name, size):
 
 def search_and_verify_image(upc, name, brand):
     """
-    Query manufacturer domain / metadata to extract product image.
+    Query product APIs / repositories to extract product image.
     Returns (image_url, score, status)
     """
-    # Replace with your official manufacturer scraper/API call
-    return f"https://images.example.com/products/{upc}.jpg", 95, "ACCEPT"
+    clean_upc = clean_gtin(upc)
+    
+    # 1. Check Open Food Facts / Open Products CDN by UPC if present
+    if clean_upc:
+        try:
+            # Strip extra leading zeros for 12-digit UPC lookup if necessary
+            upc_short = clean_upc.lstrip('0')
+            off_url = f"https://world.openfoodfacts.org/api/v0/product/{clean_upc}.json"
+            req = urllib.request.Request(off_url, headers={'User-Agent': 'CountrySpiritShopCatalog/1.0'})
+            
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                data = json.loads(resp.read().decode('utf-8'))
+                if data.get('status') == 1 and 'product' in data:
+                    img = data['product'].get('image_front_url') or data['product'].get('image_url')
+                    if img:
+                        return img, 90, "ACCEPT"
+        except Exception:
+            pass
+
+    # 2. Return fallback empty image status if no valid URL found
+    return "", 0, "NO_IMAGE"
 
 def main():
     cache = load_cache()
     new_items = []
     all_processed_items = []
 
-    with open(INVENTORY_CSV, mode='r', encoding='utf-8') as infile:
+    if not os.path.exists(INVENTORY_CSV):
+        print(f"Error: {INVENTORY_CSV} not found.")
+        return
+
+    with open(INVENTORY_CSV, mode='r', encoding='utf-8-sig') as infile:
         reader = csv.DictReader(infile)
-        fieldnames = reader.fieldnames
+        fieldnames = list(reader.fieldnames or [])
 
         for row in reader:
-            upc = clean_gtin(row.get('UPC Full') or row.get('UPC/GTIN'))
+            upc = clean_gtin(row.get('UPC Full') or row.get('UPC/GTIN') or row.get('UPC'))
             sku = row.get('SKU', '')
-            key = upc if upc else f"SKU_{sku}"
+            key = upc if upc else f"SKU_{sku}" if sku else f"NAME_{row.get('Name', '')}"
 
             # 1. Fill Description Column
-            product_name = row.get('Name', '')
+            product_name = row.get('Name', '') or row.get('Item Name', '')
             product_size = row.get('Size', '')
             row['description'] = generate_description(product_name, product_size)
 
             # 2. Match or Scrape Image
-            if key in cache:
+            if key in cache and cache[key].get('image_url'):
                 # Reuse cached data
                 row['image_url'] = cache[key]['image_url']
-                row['confidence_score'] = cache[key]['confidence_score']
-                row['status'] = cache[key]['status']
+                row['confidence_score'] = cache[key].get('confidence_score', 100)
+                row['status'] = cache[key].get('status', 'CACHED')
             else:
                 # Brand new item -> Scrape & verify
                 image_url, score, status = search_and_verify_image(
