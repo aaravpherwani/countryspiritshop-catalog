@@ -93,6 +93,7 @@
       transition: all 0.15s ease;
       box-shadow: none;
       box-sizing: border-box;
+      cursor: pointer;
     }
 
     .action-btn:hover {
@@ -236,7 +237,6 @@
       box-shadow: var(--shadow-sm);
       transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
       position: relative;
-      overflow: hidden;
       color: inherit;
     }
 
@@ -306,14 +306,18 @@
       padding-top: 0.85rem;
       border-top: 1px solid #f1f5f9;
       width: 100%;
+      position: relative;
+      z-index: 2;
     }
 
     .card-call-btn {
-      display: inline-flex;
+      display: inline-flex !important;
       align-items: center;
       justify-content: center;
       width: 36px;
       height: 36px;
+      min-width: 36px;
+      min-height: 36px;
       border-radius: 50%;
       border: 1px solid #000000;
       color: #000000;
@@ -322,6 +326,13 @@
       font-size: 0.85rem;
       flex-shrink: 0;
       transition: all 0.15s ease;
+      cursor: pointer;
+      position: relative;
+      z-index: 5;
+    }
+
+    .card-call-btn i {
+      pointer-events: none;
     }
 
     .card-call-btn:hover {
@@ -331,7 +342,7 @@
     }
 
     .card-call-btn:active {
-      transform: scale(0.96);
+      transform: scale(0.95);
     }
 
     .card-order-btn {
@@ -354,6 +365,9 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      cursor: pointer;
+      position: relative;
+      z-index: 5;
     }
 
     .card-order-btn:hover {
@@ -480,9 +494,11 @@
         letter-spacing: 0;
       }
       .card-call-btn {
-        width: 32px;
-        height: 32px;
-        font-size: 0.75rem;
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        min-height: 34px;
+        font-size: 0.8rem;
       }
     }
   </style>
@@ -731,7 +747,7 @@
               </div>
             </div>
             <div class="card-actions">
-              <a href="tel:+12032634572" class="card-call-btn" title="Call Store">
+              <a href="tel:+12032634572" class="card-call-btn" aria-label="Call Store">
                 <i class="fa-solid fa-phone"></i>
               </a>
               <a href="${STORE_ORDER_URL}" target="_blank" rel="noopener noreferrer" class="card-order-btn">
