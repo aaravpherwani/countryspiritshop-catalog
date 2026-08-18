@@ -688,7 +688,7 @@
     }
 
     function getItemOrderUrl(product) {
-      const query = `${product.name} ${product.size}`.trim();
+      const query = product.name.trim();
       return `https://www.ubereats.com/store/country-spirit-shop/RUSUed0gXCywRi416n9Ecw?mod=inStoreSearch&ps=1&searchResultsQuery=${encodeURIComponent(query)}`;
     }
 
