@@ -237,9 +237,7 @@
       transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
       position: relative;
       overflow: hidden;
-      text-decoration: none;
       color: inherit;
-      cursor: pointer;
     }
 
     @media (hover: hover) {
@@ -247,9 +245,6 @@
         transform: translateY(-4px);
         box-shadow: var(--shadow-md);
         border-color: var(--accent);
-      }
-      .product-card:hover .product-name {
-        color: var(--accent);
       }
     }
 
@@ -263,7 +258,6 @@
       color: var(--text-main);
       line-height: 1.4;
       margin-bottom: 0.35rem;
-      transition: color 0.2s ease;
     }
 
     .product-meta {
@@ -303,25 +297,64 @@
       color: var(--text-main);
     }
 
-    .ai-icon-hint {
-      width: 22px;
-      height: 22px;
-      object-fit: contain;
-      opacity: 0.7;
+    /* Product Card Action Buttons */
+    .product-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .product-call-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      transition: opacity 0.2s ease, transform 0.2s ease;
+      border: 1.5px solid #000000;
+      color: #000000;
+      background-color: transparent;
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: background-color 0.15s ease, color 0.15s ease;
+      flex-shrink: 0;
     }
-    
-    .product-card:hover .ai-icon-hint {
-      opacity: 1;
-      transform: scale(1.12);
+
+    .product-call-btn:hover {
+      background-color: #000000;
+      color: #ffffff;
     }
+
+    .product-order-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 0.65rem;
+      height: 32px;
+      border: 1.5px solid #000000;
+      border-radius: 6px;
+      color: #000000;
+      background-color: transparent;
+      text-decoration: none;
+      font-size: 0.725rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .product-order-btn:hover {
+      background-color: #000000;
+      color: #ffffff;
+    }
+
     /* Load More Button */
     .load-more-container {
       text-align: center;
       margin-top: 2rem;
       margin-bottom: calc(6rem + env(safe-area-inset-bottom));
     }
+
     .btn-load-more {
       background-color: var(--accent);
       color: #ffffff;
@@ -420,6 +453,10 @@
         width: 100%;
         justify-content: center;
       }
+      .product-order-btn {
+        padding: 0 0.45rem;
+        font-size: 0.675rem;
+      }
     }
   </style>
 </head>
@@ -490,6 +527,9 @@
     let rawProducts = [];
     let filteredProducts = [];
     
+    // Base Order Store URL
+    const BASE_ORDER_URL = "https://www.order.store/store/country-spirit-shop/RUSUed0gXCywRi416n9Ecw/";
+
     // Pagination controls
     const ITEMS_PER_PAGE = 24;
     let currentPage = 1;
@@ -538,6 +578,7 @@
         const qty = parseFloat(item['Qty On Hand'] || item['Total Qty On Hand'] || 0);
         const size = item['Size'] !== 'MISC' && item['Size'] ? item['Size'].trim() : '';
         const category = (item['Category Group Name'] || '').trim();
+        const orderUrl = item['Order URL'] || item['Item URL'] || `${BASE_ORDER_URL}?q=${encodeURIComponent(name)}`;
 
         return {
           name: name,
@@ -545,7 +586,8 @@
           qty: isNaN(qty) ? 0 : qty,
           size: size,
           category: category,
-          upc: item['UPC Full'] || item['Stock Code'] || ''
+          upc: item['UPC Full'] || item['Stock Code'] || '',
+          orderUrl: orderUrl
         };
       }).filter(p => {
         // Base criteria: must have an active name, stock, and positive price
@@ -596,7 +638,7 @@
       });
     }
 
-    // New Function: Handles checking the URL fragment hash and applying filters
+    // Handles checking the URL fragment hash and applying filters
     function checkHashRoute() {
       const hash = decodeURIComponent(window.location.hash.substring(1)).trim();
       
@@ -676,10 +718,8 @@
       }
 
       productGrid.innerHTML = productsToDisplay.map(product => {
-        const aiPrompt = `Provide product details for ${product.name} ${product.size}. Include a short description, tasting notes, brand background, and an image if available. Focus only on this product.`;
-        const aiUrl = `https://chatgpt.com/?q=${encodeURIComponent(aiPrompt)}`;
         return `
-          <a href="${aiUrl}" target="_blank" rel="noopener noreferrer" class="product-card" title="Get AI product details">
+          <div class="product-card">
             <div class="product-details">
               <h3 class="product-name">${escapeHTML(product.name)}</h3>
               <div class="product-meta">
@@ -691,12 +731,16 @@
                 <span class="price-label">Price</span>
                 <span class="product-price">$${product.price.toFixed(2)}</span>
               </div>
-              <img 
-  src="https://cdn.freepixel.com/thumb/free-svg-a-stylized-icon-representing-information-or-detail-th-1403-info-sparkle-48-filled-c-os-167341.jpg"
-  class="ai-icon-hint"
-  alt="AI product details">
+              <div class="product-actions">
+                <a href="tel:+12032634572" class="product-call-btn" title="Call Us">
+                  <i class="fa-solid fa-phone"></i>
+                </a>
+                <a href="${escapeHTML(product.orderUrl)}" target="_blank" rel="noopener noreferrer" class="product-order-btn">
+                  ORDER ONLINE
+                </a>
+              </div>
             </div>
-          </a>
+          </div>
         `;
       }).join('');
 
