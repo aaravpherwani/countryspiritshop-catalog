@@ -297,55 +297,68 @@
       color: var(--text-main);
     }
 
-    /* Product Card Action Buttons */
-    .product-actions {
+    /* Product Card Action Buttons (Call & Order Online) */
+    .card-actions {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.6rem;
+      margin-top: 1rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid #f1f5f9;
     }
 
-    .product-call-btn {
+    .card-call-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       border: 1.5px solid #000000;
       color: #000000;
       background-color: transparent;
       text-decoration: none;
-      font-size: 0.85rem;
-      transition: background-color 0.15s ease, color 0.15s ease;
+      font-size: 0.9rem;
       flex-shrink: 0;
+      transition: all 0.15s ease;
     }
 
-    .product-call-btn:hover {
-      background-color: #000000;
-      color: #ffffff;
+    .card-call-btn:hover {
+      background-color: #f1f5f9;
+      transform: scale(1.05);
     }
 
-    .product-order-btn {
+    .card-call-btn:active {
+      transform: scale(0.95);
+    }
+
+    .card-order-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 0 0.65rem;
-      height: 32px;
+      flex: 1;
+      height: 36px;
       border: 1.5px solid #000000;
       border-radius: 6px;
-      color: #000000;
-      background-color: transparent;
+      background-color: #ffffff;
+      color: #0d1b2a;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
       text-decoration: none;
-      font-size: 0.725rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
+      transition: all 0.15s ease;
       white-space: nowrap;
-      transition: background-color 0.15s ease, color 0.15s ease;
     }
 
-    .product-order-btn:hover {
-      background-color: #000000;
-      color: #ffffff;
+    .card-order-btn:hover {
+      background-color: #f8fafc;
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .card-order-btn:active {
+      transform: translateY(1px);
     }
 
     /* Load More Button */
@@ -354,7 +367,6 @@
       margin-top: 2rem;
       margin-bottom: calc(6rem + env(safe-area-inset-bottom));
     }
-
     .btn-load-more {
       background-color: var(--accent);
       color: #ffffff;
@@ -453,9 +465,14 @@
         width: 100%;
         justify-content: center;
       }
-      .product-order-btn {
-        padding: 0 0.45rem;
-        font-size: 0.675rem;
+      .card-order-btn {
+        font-size: 0.72rem;
+        height: 34px;
+      }
+      .card-call-btn {
+        width: 34px;
+        height: 34px;
+        font-size: 0.82rem;
       }
     }
   </style>
@@ -527,9 +544,6 @@
     let rawProducts = [];
     let filteredProducts = [];
     
-    // Base Order Store URL
-    const BASE_ORDER_URL = "https://www.order.store/store/country-spirit-shop/RUSUed0gXCywRi416n9Ecw/";
-
     // Pagination controls
     const ITEMS_PER_PAGE = 24;
     let currentPage = 1;
@@ -578,7 +592,6 @@
         const qty = parseFloat(item['Qty On Hand'] || item['Total Qty On Hand'] || 0);
         const size = item['Size'] !== 'MISC' && item['Size'] ? item['Size'].trim() : '';
         const category = (item['Category Group Name'] || '').trim();
-        const orderUrl = item['Order URL'] || item['Item URL'] || `${BASE_ORDER_URL}?q=${encodeURIComponent(name)}`;
 
         return {
           name: name,
@@ -586,8 +599,7 @@
           qty: isNaN(qty) ? 0 : qty,
           size: size,
           category: category,
-          upc: item['UPC Full'] || item['Stock Code'] || '',
-          orderUrl: orderUrl
+          upc: item['UPC Full'] || item['Stock Code'] || ''
         };
       }).filter(p => {
         // Base criteria: must have an active name, stock, and positive price
@@ -717,7 +729,12 @@
         return;
       }
 
+      const storeBaseUrl = 'https://www.order.store/store/country-spirit-shop/RUSUed0gXCywRi416n9Ecw/';
+
       productGrid.innerHTML = productsToDisplay.map(product => {
+        const searchQuery = `${product.name} ${product.size}`.trim();
+        const orderUrl = `${storeBaseUrl}?q=${encodeURIComponent(searchQuery)}`;
+
         return `
           <div class="product-card">
             <div class="product-details">
@@ -731,14 +748,14 @@
                 <span class="price-label">Price</span>
                 <span class="product-price">$${product.price.toFixed(2)}</span>
               </div>
-              <div class="product-actions">
-                <a href="tel:+12032634572" class="product-call-btn" title="Call Us">
-                  <i class="fa-solid fa-phone"></i>
-                </a>
-                <a href="${escapeHTML(product.orderUrl)}" target="_blank" rel="noopener noreferrer" class="product-order-btn">
-                  ORDER ONLINE
-                </a>
-              </div>
+            </div>
+            <div class="card-actions">
+              <a href="tel:+12032634572" class="card-call-btn" title="Call Store">
+                <i class="fa-solid fa-phone"></i>
+              </a>
+              <a href="${orderUrl}" target="_blank" rel="noopener noreferrer" class="card-order-btn">
+                ORDER ONLINE
+              </a>
             </div>
           </div>
         `;
