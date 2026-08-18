@@ -316,6 +316,7 @@
       opacity: 1;
       transform: scale(1.12);
     }
+
     /* Load More Button */
     .load-more-container {
       text-align: center;
@@ -505,7 +506,7 @@
 
     // Fetch and parse CSV
     document.addEventListener('DOMContentLoaded', () => {
-      const csvFilePath = 'items-7_30_2622_08_49.csv';
+      const csvFilePath = 'final.csv';
 
       Papa.parse(csvFilePath, {
         download: true,
@@ -523,7 +524,7 @@
               processCSVData(results.data);
             },
             error: function() {
-              renderError('Failed to load CSV file. Please ensure items-7_30_2622_08_49.csv or items.csv exists in your repository root.');
+              renderError('Failed to load CSV file. Please ensure final.csv or items.csv exists in your repository root.');
             }
           });
         }
@@ -596,7 +597,7 @@
       });
     }
 
-    // New Function: Handles checking the URL fragment hash and applying filters
+    // Handles checking the URL fragment hash and applying filters
     function checkHashRoute() {
       const hash = decodeURIComponent(window.location.hash.substring(1)).trim();
       
