@@ -4,11 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product Catalog</title>
+  <!-- Google Fonts & Font Awesome Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght=0,300..800;1,300..800&family=Playfair+Display:ital,wght=0,400..900;1,400..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
+  <!-- PapaParse for high-performance CSV processing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <style>
@@ -433,12 +435,11 @@
       background-repeat: repeat;
       background-color: #02075d;
       color: #ffffff;
-      text-align: left;
-      padding: 2rem 1.5rem calc(6rem + env(safe-area-inset-bottom));
+      padding: 3rem 1.5rem calc(6rem + env(safe-area-inset-bottom));
       margin-top: 2rem;
       font-family: 'Playfair Display', serif;
-      font-size: 9px;
-      line-height: 1;
+      font-size: 12px;
+      line-height: 1.25;
     }
 
     .footer-content {
@@ -446,30 +447,34 @@
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      font-family: 'Playfair Display', serif;
+      align-items: flex-start;
+      text-align: left;
     }
 
     .footer-content p,
     .footer-content a {
       font-family: 'Playfair Display', serif;
-      font-size: 9px;
+      font-size: 12px;
       color: #ffffff;
       text-decoration: none;
-      line-height: 1;
       margin: 0;
       padding: 0;
     }
 
-    .footer-content a:hover {
-      opacity: 0.85;
+    .footer-content em {
+      font-style: italic;
     }
 
     .footer-content u {
       text-decoration: underline;
     }
 
-    .footer-space {
-      height: 9px; /* Represents 1 line space at 9px font size */
+    .footer-content a:hover {
+      opacity: 0.85;
+    }
+
+    .footer-gap {
+      height: 14px; /* Creates exactly 1 blank line space between paragraphs */
     }
 
     /* Mobile Responsiveness */
@@ -546,6 +551,10 @@
         min-height: 34px;
         font-size: 0.8rem;
       }
+      .site-footer {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
     }
   </style>
 </head>
@@ -607,12 +616,19 @@
   <footer class="site-footer">
     <div class="footer-content">
       <p><a href="https://app.countryspiritshop.com/" target="_blank" rel="noopener noreferrer">Get our app, search our catalog at any time! →</a></p>
-      <p><a href="https://app.countryspiritshop.com/" target="_blank" rel="noopener noreferrer">Quickly search thousands of products &amp; easily order online.</a></p>
-      <div class="footer-space"></div>
+      <p><a href="https://app.countryspiritshop.com/" target="_blank" rel="noopener noreferrer"><em>Quickly search thousands of products &amp; easily order online.</em></a></p>
+      
+      <div class="footer-gap"></div>
+      
       <p>Located at <a href="https://share.google/wz4WZi4TAYX5HopcZ" target="_blank" rel="noopener noreferrer">95 Main St N, Woodbury, CT 06798 →</a></p>
-      <div class="footer-space"></div>
+      
+      <div class="footer-gap"></div>
+      
       <p>Tel: <a href="tel:+12032634572"><u>203-263-4572</u></a></p>
       <p>Email: <a href="mailto:countryspiritshop1@gmail.com"><u>countryspiritshop1@gmail.com</u></a></p>
+      
+      <div class="footer-gap"></div>
+      
       <p>© 2026 Country Spirit Shop. All rights reserved.</p>
     </div>
   </footer>
