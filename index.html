@@ -4,13 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product Catalog</title>
-  <!-- Google Fonts & Font Awesome Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght=0,300..800;1,300..800&family=Playfair+Display:ital,wght=0,400..900;1,400..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- PapaParse for high-performance CSV processing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <style>
@@ -437,8 +435,10 @@
       color: #ffffff;
       padding: 3rem 1.5rem calc(6rem + env(safe-area-inset-bottom));
       margin-top: 2rem;
-      font-family: 'Playfair Display', serif;
-      font-size: 12px;
+      font-family: 'Playfair Display', serif !important;
+      font-size: 12px !important;
+      font-style: normal !important;
+      font-weight: 400 !important;
       line-height: 1.25;
     }
 
@@ -452,17 +452,16 @@
     }
 
     .footer-content p,
-    .footer-content a {
-      font-family: 'Playfair Display', serif;
-      font-size: 12px;
+    .footer-content a,
+    .footer-content span {
+      font-family: 'Playfair Display', serif !important;
+      font-size: 12px !important;
+      font-style: normal !important;
+      font-weight: 400 !important;
       color: #ffffff;
       text-decoration: none;
       margin: 0;
       padding: 0;
-    }
-
-    .footer-content em {
-      font-style: italic;
     }
 
     .footer-content u {
@@ -474,7 +473,7 @@
     }
 
     .footer-gap {
-      height: 14px; /* Creates exactly 1 blank line space between paragraphs */
+      height: 14px; /* Creates 1 blank line space */
     }
 
     /* Mobile Responsiveness */
@@ -616,7 +615,7 @@
   <footer class="site-footer">
     <div class="footer-content">
       <p><a href="https://app.countryspiritshop.com/" target="_blank" rel="noopener noreferrer">Get our app, search our catalog at any time! →</a></p>
-      <p><a href="https://app.countryspiritshop.com/" target="_blank" rel="noopener noreferrer"><em>Quickly search thousands of products &amp; easily order online.</em></a></p>
+      <p><a href="https://app.countryspiritshop.com/" target="_blank" rel="noopener noreferrer">Quickly search thousands of products &amp; easily order online.</a></p>
       
       <div class="footer-gap"></div>
       
