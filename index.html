@@ -43,7 +43,7 @@
 
     /* Header & Hero */
     header {
-      background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
       color: #fff;
       padding: 2.5rem 1.25rem 2.25rem;
       text-align: center;
@@ -58,10 +58,10 @@
     }
 
     header p {
-      font-family: 'Open Sans', sans-serif;
-      color: #cbd5e1;
+      font-family: 'Open Sans', sans-serif !important;
+      color: #e0e7ff;
       font-size: 1rem;
-      font-weight: 300;
+      font-weight: 400;
       margin-bottom: 1.25rem;
     }
 
@@ -79,14 +79,14 @@
       align-items: center;
       justify-content: center;
       background-color: #ffffff;
-      color: #0d1b2a;
-      border: 1px solid #000000;
+      color: #1e3a8a;
+      border: 1px solid #ffffff;
       border-radius: 6px;
       height: 38px;
       width: 150px;
       font-family: 'Open Sans', sans-serif;
       font-size: 0.8rem;
-      font-weight: 400;
+      font-weight: 600;
       letter-spacing: 0.04em;
       text-decoration: none;
       transition: all 0.15s ease;
@@ -97,8 +97,8 @@
 
     .action-btn:hover {
       background-color: #f8fafc;
-      border-color: var(--accent);
-      color: var(--accent);
+      border-color: #ffffff;
+      color: var(--accent-hover);
     }
 
     .action-btn:active {
@@ -116,6 +116,7 @@
 
     /* Disclaimer Banner */
     .disclaimer-banner {
+      font-family: 'Open Sans', sans-serif !important;
       font-size: 0.8rem;
       color: var(--text-muted);
       text-align: center;
@@ -126,6 +127,10 @@
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
+    }
+
+    .disclaimer-banner span {
+      font-family: 'Open Sans', sans-serif !important;
     }
 
     .disclaimer-banner i {
