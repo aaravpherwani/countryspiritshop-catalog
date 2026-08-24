@@ -662,38 +662,39 @@
     const loadMoreBtn = document.getElementById('loadMoreBtn');
 
     document.addEventListener('DOMContentLoaded', () => {
-      const csvFilePath = 'items-7_30_2622_08_49.csv';
+      // Direct reference to items.csv
+      const csvFilePath = 'items.csv';
+
+      // Check if site is being viewed via file:// protocol
+      if (window.location.protocol === 'file:') {
+        renderError('Local file security restrictions (CORS) block loading CSV files directly over file:// protocol.<br><br><b>Fix:</b> Run a local HTTP server (e.g. VS Code Live Server or "python3 -m http.server") or host on GitHub Pages.');
+        return;
+      }
 
       Papa.parse(csvFilePath, {
         download: true,
         header: true,
         skipEmptyLines: true,
         complete: function(results) {
+          if (!results.data || results.data.length === 0) {
+            renderError('items.csv was loaded but contained no data.');
+            return;
+          }
           processCSVData(results.data);
         },
-        error: function() {
-          Papa.parse('items.csv', {
-            download: true,
-            header: true,
-            skipEmptyLines: true,
-            complete: function(results) {
-              processCSVData(results.data);
-            },
-            error: function() {
-              renderError('Failed to load CSV file. Please ensure items-7_30_2622_08_49.csv or items.csv exists in your repository root.');
-            }
-          });
+        error: function(err) {
+          renderError('Failed to load items.csv. Please verify that items.csv exists in your repository root directory.');
         }
       });
     });
 
     function processCSVData(data) {
       rawProducts = data.map(item => {
-        const name = (item['Name'] || item['Item Name'] || '').trim();
-        const price = parseFloat(item['Unit Price'] || item['Modifiers Price'] || item['Price'] || 0);
-        const qty = parseFloat(item['Qty On Hand'] || item['Total Qty On Hand'] || 0);
-        const size = item['Size'] !== 'MISC' && item['Size'] ? item['Size'].trim() : '';
-        const category = (item['Category Group Name'] || '').trim();
+        const name = (item['Name'] || item['Item Name'] || item['name'] || '').trim();
+        const price = parseFloat(item['Unit Price'] || item['Modifiers Price'] || item['Price'] || item['price'] || 0);
+        const qty = parseFloat(item['Qty On Hand'] || item['Total Qty On Hand'] || item['qty'] || 1); // Defaults to 1 if no Qty column
+        const size = item['Size'] && item['Size'] !== 'MISC' ? item['Size'].trim() : '';
+        const category = (item['Category Group Name'] || item['Category'] || item['category'] || '').trim();
 
         return {
           name: name,
@@ -701,7 +702,7 @@
           qty: isNaN(qty) ? 0 : qty,
           size: size,
           category: category,
-          upc: item['UPC Full'] || item['Stock Code'] || ''
+          upc: item['UPC Full'] || item['Stock Code'] || item['UPC'] || item['upc'] || ''
         };
       }).filter(p => {
         if (!p.name || p.qty <= 0) return false;
@@ -735,6 +736,9 @@
           categorySet.add(product.category);
         }
       });
+
+      // Clear non-default options
+      categorySelect.innerHTML = '<option value="all" selected>All Categories</option>';
 
       const sortedCategories = Array.from(categorySet).sort((a, b) => a.localeCompare(b));
 
