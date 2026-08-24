@@ -1,120 +1,973 @@
-<!-- Custom CSS for Skeleton Loaders -->
-<style>
-  /* Skeleton Container Grid */
-  .skeleton-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1.5rem;
-    width: 100%;
-    padding: 1rem 0;
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Catalog</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght=0,300..800;1,300..800&family=Playfair+Display:ital,wght=0,400..900;1,400..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
-  /* Skeleton Card Base */
-  .skeleton-card {
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 1rem;
-    border: 1px solid #e5e7eb;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  }
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --accent: #1e40af;
+      --accent-hover: #1e3a8a;
+      --border-color: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+      --radius: 16px;
+    }
 
-  /* Shimmer Animation Effect */
-  .skeleton-box {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: skeleton-shimmer 1.5s infinite ease-in-out;
-    border-radius: 4px;
-  }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Open Sans', sans-serif;
+    }
 
-  @keyframes skeleton-shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-  /* Specific Skeleton Blocks */
-  .skeleton-image {
-    width: 100%;
-    height: 180px;
-    border-radius: 6px;
-  }
+    /* Header & Hero */
+    header {
+      background-image: url("https://encycolorpedia.com/02075d.png");
+      background-repeat: repeat;
+      background-color: #02075d;
+      color: #fff;
+      padding: 2.5rem 1.25rem 2.25rem;
+      text-align: center;
+    }
 
-  .skeleton-title {
-    width: 75%;
-    height: 18px;
-  }
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.01em;
+    }
 
-  .skeleton-subtitle {
-    width: 45%;
-    height: 14px;
-  }
+    header p {
+      font-family: 'Open Sans', sans-serif !important;
+      color: #e0e7ff;
+      font-size: 1rem;
+      font-weight: 400;
+      margin-bottom: 1.25rem;
+    }
 
-  .skeleton-price {
-    width: 30%;
-    height: 20px;
-    margin-top: auto;
-  }
-</style>
+    /* Action Buttons Row - Header */
+    .header-buttons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
 
-<!-- Skeleton Loader Placeholder (Shown on initial open / loading state) -->
-<div id="catalog-loader" class="skeleton-grid">
-  <!-- Render 8 skeleton cards for smooth grid layout loading -->
-  <div class="skeleton-card">
-    <div class="skeleton-box skeleton-image"></div>
-    <div class="skeleton-box skeleton-title"></div>
-    <div class="skeleton-box skeleton-subtitle"></div>
-    <div class="skeleton-box skeleton-price"></div>
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #ffffff;
+      color: #0d1b2a;
+      border: 1px solid #000000;
+      border-radius: 6px;
+      height: 38px;
+      width: 150px;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      box-shadow: none;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+
+    .action-btn:hover {
+      background-color: #f8fafc;
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .action-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 0;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* Disclaimer Banner */
+    .disclaimer-banner {
+      font-family: 'Open Sans', sans-serif !important;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 1.25rem;
+      padding: 0 0.5rem;
+      line-height: 1.4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .disclaimer-banner span {
+      font-family: 'Open Sans', sans-serif !important;
+    }
+
+    .disclaimer-banner i {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    /* Control Panel */
+    .controls-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+      margin-bottom: 1.5rem;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 0.85rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      flex: 2;
+      min-width: 220px;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      left: 1rem;
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 48px;
+      padding: 0 1rem 0 2.75rem;
+      font-size: 0.95rem;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background-color: #f8fafc;
+      color: var(--text-main);
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      background-color: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.15);
+    }
+
+    .select-dropdown {
+      height: 48px;
+      padding: 0 2.5rem 0 1rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background-color: #f8fafc;
+      color: var(--text-main);
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s ease;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1.1em;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .select-dropdown:focus, .select-dropdown:hover {
+      background-color: #fff;
+      border-color: var(--accent);
+    }
+
+    .results-count {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    /* Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* Product Card */
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      position: relative;
+      color: inherit;
+    }
+
+    @media (hover: hover) {
+      .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--accent);
+      }
+    }
+
+    .product-details {
+      margin-bottom: 1rem;
+    }
+
+    .product-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.4;
+      margin-bottom: 0.35rem;
+    }
+
+    .product-meta {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .product-size {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 0.85rem;
+      margin-top: auto;
+    }
+
+    .price-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .price-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .product-price {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* Product Card Action Buttons */
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid #f1f5f9;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+
+    .card-call-btn {
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      min-height: 36px;
+      border-radius: 50%;
+      border: 1px solid #000000;
+      color: #000000;
+      background-color: #ffffff;
+      text-decoration: none;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      position: relative;
+      z-index: 5;
+    }
+
+    .card-call-btn i {
+      pointer-events: none;
+    }
+
+    .card-call-btn:hover {
+      background-color: #f8fafc;
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .card-call-btn:active {
+      transform: scale(0.95);
+    }
+
+    .card-order-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      height: 36px;
+      padding: 0 0.25rem;
+      border: 1px solid #000000;
+      border-radius: 6px;
+      background-color: #ffffff;
+      color: #0d1b2a;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      position: relative;
+      z-index: 5;
+    }
+
+    .card-order-btn:hover {
+      background-color: #f8fafc;
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .card-order-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* Skeleton Loader Styling */
+    .skeleton-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      height: 220px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .skeleton-box {
+      background: #e2e8f0;
+      border-radius: 6px;
+      animation: skeleton-pulse 1.5s infinite ease-in-out;
+    }
+
+    .skeleton-title {
+      height: 20px;
+      width: 80%;
+      margin-bottom: 0.75rem;
+    }
+
+    .skeleton-subtitle {
+      height: 14px;
+      width: 40%;
+      margin-bottom: 2rem;
+    }
+
+    .skeleton-price-label {
+      height: 10px;
+      width: 30%;
+      margin-bottom: 0.35rem;
+    }
+
+    .skeleton-price {
+      height: 24px;
+      width: 50%;
+    }
+
+    .skeleton-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: auto;
+      padding-top: 0.85rem;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .skeleton-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .skeleton-button {
+      height: 36px;
+      flex: 1;
+      border-radius: 6px;
+    }
+
+    @keyframes skeleton-pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    /* Load More Button */
+    .load-more-container {
+      text-align: center;
+      margin-top: 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .btn-load-more {
+      background-color: var(--accent);
+      color: #ffffff;
+      border: none;
+      padding: 0.85rem 2rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-load-more:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-load-more:active {
+      transform: scale(0.98);
+    }
+
+    /* States & Loading */
+    .state-container {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--text-muted);
+      grid-column: 1 / -1;
+    }
+
+    .state-container i {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #94a3b8;
+    }
+
+    /* Site Footer */
+    .site-footer {
+      background-image: url("https://encycolorpedia.com/02075d.png");
+      background-repeat: repeat;
+      background-color: #02075d;
+      color: #ffffff;
+      padding: 3rem 1.5rem calc(6rem + env(safe-area-inset-bottom));
+      margin-top: 2rem;
+      font-family: 'Playfair Display', serif !important;
+      font-size: 12px !important;
+      font-style: normal;
+      font-weight: 400 !important;
+      line-height: 1.25;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .footer-content p,
+    .footer-content a,
+    .footer-content span,
+    .footer-content u {
+      font-family: 'Playfair Display', serif !important;
+      font-size: 12px !important;
+      color: #ffffff;
+      text-decoration: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .footer-content b, 
+    .footer-content strong {
+      font-family: 'Playfair Display', serif !important;
+      font-weight: 700 !important;
+    }
+
+    .footer-content em {
+      font-family: 'Playfair Display', serif !important;
+      font-style: italic !important;
+    }
+
+    .footer-content u {
+      text-decoration: underline !important;
+    }
+
+    .footer-content a:hover {
+      opacity: 0.85;
+    }
+
+    .footer-gap {
+      height: 14px; /* Blank line space */
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 640px) {
+      header {
+        padding: 2rem 1rem 1.5rem;
+      }
+      header h1 {
+        font-size: 2rem;
+      }
+      .header-buttons {
+        gap: 0.5rem;
+      }
+      .action-btn {
+        width: 135px;
+        height: 36px;
+        font-size: 0.75rem;
+      }
+      .container {
+        padding: 0.75rem 0.65rem 0;
+      }
+      .disclaimer-banner {
+        align-items: flex-start;
+        text-align: center;
+      }
+      .search-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+      }
+      .input-wrapper {
+        width: 100%;
+        min-width: 0;
+      }
+      .select-dropdown {
+        width: 100%;
+        min-width: 0;
+        height: 48px;
+      }
+      .results-count {
+        margin-left: 0;
+        text-align: center;
+        padding-top: 0.25rem;
+      }
+      .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 0.65rem;
+      }
+      .product-card, .skeleton-card {
+        padding: 0.85rem 0.75rem;
+      }
+      .product-name {
+        font-size: 0.875rem;
+      }
+      .product-price {
+        font-size: 1.05rem;
+      }
+      .btn-load-more {
+        width: 100%;
+        justify-content: center;
+      }
+      .card-actions {
+        gap: 0.35rem;
+      }
+      .card-order-btn {
+        font-size: 0.68rem;
+        height: 34px;
+        letter-spacing: 0;
+      }
+      .card-call-btn {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        min-height: 34px;
+        font-size: 0.8rem;
+      }
+      .site-footer {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Product Catalog</h1>
+    <p>Explore our wide selection of items</p>
+    
+    <div class="header-buttons">
+      <a href="tel:+12032634572" class="action-btn">CALL US</a>
+      <a href="https://share.google/wz4WZi4TAYX5HopcZ" target="_blank" rel="noopener noreferrer" class="action-btn">VISIT TODAY</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="disclaimer-banner">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>Disclaimer: Information displayed is for informational purposes only and may not reflect real-time pricing or item availability.</span>
+    </div>
+
+    <div class="controls-card">
+      <div class="search-row">
+        <div class="input-wrapper">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search by name/code...">
+        </div>
+
+        <select id="categorySelect" class="select-dropdown">
+          <option value="all" selected>All Categories</option>
+        </select>
+
+        <select id="sortSelect" class="select-dropdown">
+          <option value="name-asc" selected>Name (A → Z)</option>
+          <option value="name-desc">Name (Z → A)</option>
+          <option value="price-low">Price (Low → High)</option>
+          <option value="price-high">Price (High → Low)</option>
+        </select>
+
+        <div id="resultsCount" class="results-count">Showing 0 products</div>
+      </div>
+    </div>
+
+    <div id="productGrid" class="product-grid">
+      <!-- Skeleton Loaders rendered by default on load -->
+    </div>
+
+    <div id="loadMoreContainer" class="load-more-container" style="display: none;">
+      <button id="loadMoreBtn" class="btn-load-more">
+        <span>Load More Items</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
+    </div>
   </div>
-  <div class="skeleton-card">
-    <div class="skeleton-box skeleton-image"></div>
-    <div class="skeleton-box skeleton-title"></div>
-    <div class="skeleton-box skeleton-subtitle"></div>
-    <div class="skeleton-box skeleton-price"></div>
-  </div>
-  <div class="skeleton-card">
-    <div class="skeleton-box skeleton-image"></div>
-    <div class="skeleton-box skeleton-title"></div>
-    <div class="skeleton-box skeleton-subtitle"></div>
-    <div class="skeleton-box skeleton-price"></div>
-  </div>
-  <div class="skeleton-card">
-    <div class="skeleton-box skeleton-image"></div>
-    <div class="skeleton-box skeleton-title"></div>
-    <div class="skeleton-box skeleton-subtitle"></div>
-    <div class="skeleton-box skeleton-price"></div>
-  </div>
-  <div class="skeleton-card">
-    <div class="skeleton-box skeleton-image"></div>
-    <div class="skeleton-box skeleton-title"></div>
-    <div class="skeleton-box skeleton-subtitle"></div>
-    <div class="skeleton-box skeleton-price"></div>
-  </div>
-  <div class="skeleton-card">
-    <div class="skeleton-box skeleton-image"></div>
-    <div class="skeleton-box skeleton-title"></div>
-    <div class="skeleton-box skeleton-subtitle"></div>
-    <div class="skeleton-box skeleton-price"></div>
-  </div>
-  <div class="skeleton-card">
-    <div class="skeleton-box skeleton-image"></div>
-    <div class="skeleton-box skeleton-title"></div>
-    <div class="skeleton-box skeleton-subtitle"></div>
-    <div class="skeleton-box skeleton-price"></div>
-  </div>
-  <div class="skeleton-card">
-    <div class="skeleton-box skeleton-image"></div>
-    <div class="skeleton-box skeleton-title"></div>
-    <div class="skeleton-box skeleton-subtitle"></div>
-    <div class="skeleton-box skeleton-price"></div>
-  </div>
-</div>
 
-<!-- Updated "Not Found" / Request Banner -->
-<div id="no-results-banner" class="no-results-container" style="display: none; text-align: center; padding: 2rem;">
-  <i class="fa-solid fa-magnifying-glass" style="font-size: 2.5rem; color: #6b7280; margin-bottom: 1rem;"></i>
-  <p style="font-size: 1rem; color: #374151;">
-    Can’t find what you’re looking for? Let us know and we’ll do our best to get it for you!
-  </p>
-</div>
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p><a href="https://app.countryspiritshop.com/" target="_blank" rel="noopener noreferrer"><b>Get our app, search our catalog at any time!</b> →</a></p>
+      <p><a href="https://app.countryspiritshop.com/" target="_blank" rel="noopener noreferrer"><em>Quickly search thousands of products &amp; easily order online.</em></a></p>
+      
+      <div class="footer-gap"></div>
+      
+      <p><a href="https://share.google/wz4WZi4TAYX5HopcZ" target="_blank" rel="noopener noreferrer"><b>Located at 95 Main St N, Woodbury, CT 06798</b> →</a></p>
+      <p><a href="tel:+12032634572"><u>203-263-4572</u></a> • <a href="mailto:countryspiritshop1@gmail.com"><u>countryspiritshop1@gmail.com</u></a></p>
+      
+      <div class="footer-gap"></div>
+      
+      <p>© 2026 Country Spirit Shop. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    let rawProducts = [];
+    let filteredProducts = [];
+    
+    const ITEMS_PER_PAGE = 24;
+    let currentPage = 1;
+    const STORE_ORDER_URL = "https://www.order.store/store/country-spirit-shop/RUSUed0gXCywRi416n9Ecw";
+
+    const productGrid = document.getElementById('productGrid');
+    const searchInput = document.getElementById('searchInput');
+    const categorySelect = document.getElementById('categorySelect');
+    const sortSelect = document.getElementById('sortSelect');
+    const resultsCount = document.getElementById('resultsCount');
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Render initial skeleton state immediately
+      renderSkeletons();
+
+      // Direct reference to items.csv
+      const csvFilePath = 'items.csv';
+
+      // Check if site is being viewed via file:// protocol
+      if (window.location.protocol === 'file:') {
+        renderError('Local file security restrictions (CORS) block loading CSV files directly over file:// protocol.<br><br><b>Fix:</b> Run a local HTTP server (e.g. VS Code Live Server or "python3 -m http.server") or host on GitHub Pages.');
+        return;
+      }
+
+      Papa.parse(csvFilePath, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          if (!results.data || results.data.length === 0) {
+            renderError('items.csv was loaded but contained no data.');
+            return;
+          }
+          processCSVData(results.data);
+        },
+        error: function(err) {
+          renderError('Failed to load items.csv. Please verify that items.csv exists in your repository root directory.');
+        }
+      });
+    });
+
+    function renderSkeletons() {
+      const skeletonCards = Array(8).fill(0).map(() => `
+        <div class="skeleton-card">
+          <div class="skeleton-box skeleton-title"></div>
+          <div class="skeleton-box skeleton-subtitle"></div>
+          <div class="skeleton-box skeleton-price-label"></div>
+          <div class="skeleton-box skeleton-price"></div>
+          <div class="skeleton-actions">
+            <div class="skeleton-box skeleton-circle"></div>
+            <div class="skeleton-box skeleton-button"></div>
+          </div>
+        </div>
+      `).join('');
+      productGrid.innerHTML = skeletonCards;
+    }
+
+    function processCSVData(data) {
+      rawProducts = data.map(item => {
+        const name = (item['Name'] || item['Item Name'] || item['name'] || '').trim();
+        const price = parseFloat(item['Unit Price'] || item['Modifiers Price'] || item['Price'] || item['price'] || 0);
+        const qty = parseFloat(item['Qty On Hand'] || item['Total Qty On Hand'] || item['qty'] || 1); // Defaults to 1 if no Qty column
+        const size = item['Size'] && item['Size'] !== 'MISC' ? item['Size'].trim() : '';
+        const category = (item['Category Group Name'] || item['Category'] || item['category'] || '').trim();
+
+        return {
+          name: name,
+          price: isNaN(price) ? 0 : price,
+          qty: isNaN(qty) ? 0 : qty,
+          size: size,
+          category: category,
+          upc: item['UPC Full'] || item['Stock Code'] || item['UPC'] || item['upc'] || ''
+        };
+      }).filter(p => {
+        if (!p.name || p.qty <= 0) return false;
+        if (p.price <= 0) return false;
+
+        const lowerName = p.name.toLowerCase();
+        if (
+          lowerName.includes('env fee') ||
+          lowerName.includes('environmental fee') ||
+          lowerName.includes('enviornmental fee') ||
+          lowerName.includes('envoronmental fee') ||
+          lowerName.includes('freight charge') ||
+          lowerName.includes('deposit') ||
+          lowerName.includes('summary level adjustments')
+        ) {
+          return false;
+        }
+
+        return true;
+      });
+
+      populateCategoryDropdown();
+      checkHashRoute();
+    }
+
+    function populateCategoryDropdown() {
+      const categorySet = new Set();
+      
+      rawProducts.forEach(product => {
+        if (product.category) {
+          categorySet.add(product.category);
+        }
+      });
+
+      // Clear non-default options
+      categorySelect.innerHTML = '<option value="all" selected>All Categories</option>';
+
+      const sortedCategories = Array.from(categorySet).sort((a, b) => a.localeCompare(b));
+
+      sortedCategories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+      });
+    }
+
+    function checkHashRoute() {
+      const hash = decodeURIComponent(window.location.hash.substring(1)).trim();
+      
+      if (hash) {
+        const options = Array.from(categorySelect.options);
+        const matchedOption = options.find(opt => opt.value.toLowerCase() === hash.toLowerCase());
+        
+        if (matchedOption) {
+          categorySelect.value = matchedOption.value;
+        } else {
+          categorySelect.value = 'all';
+        }
+      } else {
+        categorySelect.value = 'all';
+      }
+      applyFiltersAndSort(false);
+    }
+
+    function applyFiltersAndSort(updateHash = true) {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      const selectedCategory = categorySelect.value;
+      const sortOption = sortSelect.value;
+
+      if (updateHash) {
+        if (selectedCategory === 'all') {
+          history.replaceState(null, null, ' ');
+        } else {
+          window.location.hash = encodeURIComponent(selectedCategory);
+        }
+      }
+
+      currentPage = 1;
+
+      filteredProducts = rawProducts.filter(product => {
+        const matchesSearch = product.name.toLowerCase().includes(searchTerm) || 
+                              product.upc.toLowerCase().includes(searchTerm);
+        
+        const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+        
+        return matchesSearch && matchesCategory;
+      });
+
+      if (sortOption === 'name-desc') {
+        filteredProducts.sort((a, b) => b.name.localeCompare(a.name));
+      } else if (sortOption === 'price-low') {
+        filteredProducts.sort((a, b) => a.price - b.price);
+      } else if (sortOption === 'price-high') {
+        filteredProducts.sort((a, b) => b.price - a.price);
+      } else {
+        filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+      }
+
+      renderGrid();
+    }
+
+    function renderGrid() {
+      const visibleCount = currentPage * ITEMS_PER_PAGE;
+      const productsToDisplay = filteredProducts.slice(0, visibleCount);
+
+      resultsCount.textContent = `Showing ${productsToDisplay.length} of ${filteredProducts.length} product${filteredProducts.length !== 1 ? 's' : ''}`;
+
+      if (filteredProducts.length === 0) {
+        productGrid.innerHTML = `
+          <div class="state-container">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <p>Can’t find what you’re looking for? Let us know and we’ll do our best to get it for you!</p>
+          </div>
+        `;
+        loadMoreContainer.style.display = 'none';
+        return;
+      }
+
+      productGrid.innerHTML = productsToDisplay.map(product => {
+        return `
+          <div class="product-card">
+            <div class="product-details">
+              <h3 class="product-name">${escapeHTML(product.name)}</h3>
+              <div class="product-meta">
+                ${product.size ? `<span class="product-size"><i class="fa-solid fa-tag"></i> ${escapeHTML(product.size)}</span>` : ''}
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="price-container">
+                <span class="price-label">Price</span>
+                <span class="product-price">$${product.price.toFixed(2)}</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <a href="tel:+12032634572" class="card-call-btn" aria-label="Call Store">
+                <i class="fa-solid fa-phone"></i>
+              </a>
+              <a href="${STORE_ORDER_URL}" target="_blank" rel="noopener noreferrer" class="card-order-btn">
+                ORDER ONLINE
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (visibleCount < filteredProducts.length) {
+        loadMoreContainer.style.display = 'block';
+      } else {
+        loadMoreContainer.style.display = 'none';
+      }
+    }
+
+    function loadMore() {
+      currentPage++;
+      renderGrid();
+    }
+
+    function renderError(msg) {
+      productGrid.innerHTML = `
+        <div class="state-container">
+          <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i>
+          <p>${msg}</p>
+        </div>
+      `;
+      loadMoreContainer.style.display = 'none';
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+
+    // Event Listeners
+    searchInput.addEventListener('input', () => applyFiltersAndSort(true));
+    categorySelect.addEventListener('change', () => applyFiltersAndSort(true));
+    sortSelect.addEventListener('change', () => applyFiltersAndSort(true));
+    loadMoreBtn.addEventListener('click', loadMore);
+
+    window.addEventListener('hashchange', checkHashRoute);
+  </script>
+</body>
+</html>
